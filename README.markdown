@@ -3,7 +3,7 @@ A simple proof-of-concept prototype for background parallax.
 Using the prototype
 -------------------
 
-Open <http://gordonbrander.github.com/gaia-parallax-prototype/> on a FirefoxOS
+Open <http://gordonbrander.github.com/gaia-deck-prototype/> on a FirefoxOS
 phone.
 
 * Swipe or touch from the right edge of the screen to advance one panel.
