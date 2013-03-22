@@ -1,0 +1,90 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<!doctype html>
+<html lang="en" class="screen">
+<head>
+	<meta charset="utf-8">
+	<title>Parallax</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="assets/vendor/normalize.css" type="text/css" />
+  <link rel="stylesheet" href="assets/demo/demo.css" type="text/css" />
+</head>
+<body>
+  <div class="demo-stage" id="demo-stage">
+    <div class="demo-phone-frame"></div>
+    <div class="demo-matte"></div>
+    <a class="demo-prev" id="demo-prev" href="#go-prev"></a>
+    <a class="demo-next" id="demo-next" href="#go-next"></a>
+    <div class="demo-mask">
+      <div class="demo-status-bar"></div>
+      <div class="home-background" style="background-image: url(assets/wallpaper1.jpg); width: 1600px;" id="home-background-1"></div>
+      <ul class="home-screens" id="home-screens">
+        <li class="home-screen home-lock-screen">
+          <time class="home-time">3:10</time>
+
+          <div class="banners">
+            <article class="banner">
+              <h1 class="title">Annual check up</h1>
+              <p class="subtitle">7:30, Dr Franklin's office</p>
+            </article>
+            <article class="banner">
+              <h1 class="title">Hey what time are you guys going to start the
+              game?</h1>
+              <p class="subtitle">Russle Bonaguro</p>
+            </article>
+            <article class="banner">
+              <h1 class="title">Welcome to the MOMAStore!</h1>
+              <p class="subtitle">MOMAStore</p>
+            </article>
+         </div>
+        </li>
+        <li class="home-screen">
+          <img class="demo-app-grid" src="assets/demo/app-grid.png" alt="" />
+        </li>
+        <li class="home-screen"><span class="icon"><img src="assets/demo/usage-tracker.png" width="320" height="380" /></span></li>
+        <li class="home-screen"></li>
+        <li class="home-screen"></li>
+        <li class="home-screen"></li>
+        <li class="home-screen"></li>
+        <li class="home-screen"></li>
+        <li class="home-screen">Last panel</li>
+      </ul>
+    </div><!-- .home-mask -->
+  </div><!-- .demo-stage -->
+  <script type="text/javascript" src="assets/index.js"></script>
+  <script type="text/javascript">
+    var stageEl = document.getElementById('demo-stage');
+    var homeScreensEl = document.getElementById('home-screens');
+    var bg1El = document.getElementById('home-background-1');
+    var nextEl = document.getElementById('demo-next');
+    var prevEl = document.getElementById('demo-prev');
+
+    var STATE = updateState({}, {
+      index: 0,
+      units: 9,
+      unitWidth: 320,
+      backgroundWidth: bg1El.clientWidth,
+      screensEl: homeScreensEl,
+      screenEls: homeScreensEl.children,
+      backgroundEl: bg1El
+    }, STATE_FILTERS);
+
+    // Set up stage.
+    // Run `enter` and `render`.
+    STATE = render(enter(STATE));
+
+    stageEl.addEventListener(touchstart, function (event) {
+      if (event.target === nextEl) {
+        STATE = render(updateState(STATE, { index: STATE.index + 1 }, STATE_FILTERS));
+        event.preventDefault();
+      }
+      else if (event.target === prevEl) {
+        STATE = render(updateState(STATE, { index: STATE.index - 1 }, STATE_FILTERS));
+        event.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>
+
