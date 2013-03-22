@@ -124,33 +124,6 @@ a:active {
   margin: 10px 0 0 0;
 }
 
-.app {
-  float: left;
-  height: 22px;
-  padding-top: 78px;
-  position: relative;
-  width: 80px;
-}
-
-.app > .icon {
-  background: url(app-icon.png);
-  display: block;
-  left: 8px;
-  position: absolute;
-  top: 10px;
-  width: 64px;
-  height: 64px;
-}
-
-.app > .title {
-  color: #fff;
-  display: block;
-  font-size: 12px;
-  font-weight: bold;
-  text-align: center;
-  text-shadow: 0px 1px 1px rgba(0, 0, 0, .7);
-}
-
 .banners {
   bottom: 0;
   left: 0;
