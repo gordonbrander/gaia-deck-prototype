@@ -42,7 +42,13 @@
         <li class="home-screen">
           <img class="demo-app-grid" src="assets/demo/app-grid.png" alt="" />
         </li>
-        <li class="home-screen"><span class="icon"><img src="assets/demo/usage-tracker.png" width="320" height="380" /></span></li>
+        <li class="home-screen">
+          <div class="deck-card deck-card-zoomed-out">
+            <div class="deck-card-in">
+              <img src="assets/demo/Clock-1_2.png" alt="" />
+            </div>
+          </div>
+        </li>
         <li class="home-screen"></li>
         <li class="home-screen"></li>
         <li class="home-screen"></li>
@@ -52,39 +58,7 @@
       </ul>
     </div><!-- .home-mask -->
   </div><!-- .demo-stage -->
-  <script type="text/javascript" src="assets/index.js"></script>
-  <script type="text/javascript">
-    var stageEl = document.getElementById('demo-stage');
-    var homeScreensEl = document.getElementById('home-screens');
-    var bg1El = document.getElementById('home-background-1');
-    var nextEl = document.getElementById('demo-next');
-    var prevEl = document.getElementById('demo-prev');
-
-    var STATE = updateState({}, {
-      index: 0,
-      units: 9,
-      unitWidth: 320,
-      backgroundWidth: bg1El.clientWidth,
-      screensEl: homeScreensEl,
-      screenEls: homeScreensEl.children,
-      backgroundEl: bg1El
-    }, STATE_FILTERS);
-
-    // Set up stage.
-    // Run `enter` and `render`.
-    STATE = render(enter(STATE));
-
-    stageEl.addEventListener(touchstart, function (event) {
-      if (event.target === nextEl) {
-        STATE = render(updateState(STATE, { index: STATE.index + 1 }, STATE_FILTERS));
-        event.preventDefault();
-      }
-      else if (event.target === prevEl) {
-        STATE = render(updateState(STATE, { index: STATE.index - 1 }, STATE_FILTERS));
-        event.preventDefault();
-      }
-    });
-  </script>
+  <script type="text/javascript" src="bundle.js"></script>
 </body>
 </html>
 

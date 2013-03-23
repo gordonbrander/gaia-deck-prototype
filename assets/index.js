@@ -1,7 +1,41 @@
+// Imports
+// -----------------------------------------------------------------------------
+
+var fold = require('reducers/fold');
+var filter = require('reducers/filter');
+var map = require('reducers/map');
+var expand = require('reducers/expand');
+var print = require('reducers/debug/print');
+
+var open = require('dom-reduce/event');
+
+var geneology = require('./geneology-reduce.js');
+
+// DOM
+// -----------------------------------------------------------------------------
+
 var isTouch = 'ontouchstart' in window;
 var touchstart = isTouch ? 'touchstart' : 'mousedown';
 var touchmove = isTouch ? 'touchmove' : 'mousemove';
 var touchend = isTouch ? 'touchend' : 'mouseup';
+
+function hasClass(el, classname) {
+  return el.classList && el.classList.contains(classname);
+}
+
+function toggleClass(el, classname) {
+  el.classList.toggle(classname);
+  return el;
+}
+
+function liftEventTarget(lambda) {
+  return function liftedForEventTarget(event) {
+    return lambda(event.target);
+  }
+}
+
+// Parallax
+// -----------------------------------------------------------------------------
 
 function syncParallax(distance, totalWidth, backgroundWidth, viewportWidth) {
   // Find the distance for b such that a and b, starting at 0 arrive
@@ -27,18 +61,6 @@ function syncParallax(distance, totalWidth, backgroundWidth, viewportWidth) {
   // Calculate the corresponding distance for b given a.
   return clamp(distance * backgroundToOffsetRatio, 0, distance);
 }
-
-function snap(distance, unit, threshold) {
-  // TODO will use this when dragging works.
-  // "Snap" a "distance" to 0 or unit via a threshold tolorance.
-  // If the distance is greater than the tolerance, snap to unit.
-  // Otherwise, snap to 0.
-  return (distance > unit * threshold) ? unit : 0;
-}
-
-// If the velocity of the swipe goes up, the threshold tolerance for snapping
-// should go down.
-
 
 function lambda(method) {
   // Convert a method func that uses a `this` context into a function that takes
@@ -126,3 +148,64 @@ function enter(state) {
   return state;
 }
 
+// Control flow logic
+// -----------------------------------------------------------------------------
+
+var stageEl = document.getElementById('demo-stage');
+var homeScreensEl = document.getElementById('home-screens');
+var bg1El = document.getElementById('home-background-1');
+var nextEl = document.getElementById('demo-next');
+var prevEl = document.getElementById('demo-prev');
+
+var STATE = updateState({}, {
+  index: 0,
+  units: 9,
+  unitWidth: 320,
+  backgroundWidth: bg1El.clientWidth,
+  screensEl: homeScreensEl,
+  screenEls: homeScreensEl.children,
+  backgroundEl: bg1El
+}, STATE_FILTERS);
+
+// Set up stage.
+// Run `enter` and `render`.
+STATE = render(enter(STATE));
+
+var tapStartsOverTime = open(document.documentElement, touchstart);
+
+var tappedElsOverTime = map(tapStartsOverTime, function getEventTarget(event) {
+  return event.target;
+});
+
+// React to prev el taps over time.
+//
+// Filter out prevEl taps.
+var prevElTapsOverTime = filter(tapStartsOverTime, liftEventTarget(function isPrevEl(el) {
+  return el === prevEl;
+}));
+
+var nextElTapsOverTime = filter(tapStartsOverTime, liftEventTarget(function isNextEl(el) {
+  return el === nextEl;
+}));
+
+var tappedAncestorsOverTime = expand(tappedElsOverTime, geneology);
+
+var cardTapsOverTime = filter(tappedAncestorsOverTime, function isCard(el) {
+  return hasClass(el, 'deck-card');
+});
+
+print(cardTapsOverTime);
+
+fold(prevElTapsOverTime, function (event) {
+  event.preventDefault();
+  STATE = render(updateState(STATE, { index: STATE.index - 1 }, STATE_FILTERS));
+});
+
+fold(nextElTapsOverTime, function (event) {
+  event.preventDefault();
+  STATE = render(updateState(STATE, { index: STATE.index + 1 }, STATE_FILTERS));
+});
+
+fold(cardTapsOverTime, function (el) {
+  toggleClass(el, 'deck-card-zoomed-out');
+});

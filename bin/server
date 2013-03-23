@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+
+var static = require('node-static');
+var http = require('http');
+
+function server(folder, port) {
+  var file = new static.Server(folder);
+  port = port || 8080;
+
+  http.createServer(function (req, res) {
+    file.serve(req, res);
+  }).listen(port);
+
+  console.log("Server listening on port", port
+          , "serving from folder", folder);
+}
+
+server(process.argv[2], process.argv[3]);
+

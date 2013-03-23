@@ -1,0 +1,24 @@
+{
+  "name": "gaia-deck-prototype",
+  "version": "0.0.1",
+  "description": "Gaia deck interaction prototype",
+  "author": "Gordon Brander <me@gordonbrander.com> (http://gordonbrander.com)",
+  "dependencies": {
+    "reducers": "2.0.x",
+    "dom-reduce": "1.0.x",
+    "functional": "~1.0.0",
+    "browserify": "*"
+  },
+  "devDependencies": {
+    "node-static": "*",
+    "chai": "*",
+    "mocha": "*",
+    "wr": "1.2.x"
+  },
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha --reporter spec",
+    "run": "make all",
+    "postinstall": "make postinstall"
+  }
+}
+
