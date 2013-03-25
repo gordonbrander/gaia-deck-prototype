@@ -149,6 +149,7 @@ a:active {
               top 150ms ease-out,
               left 150ms ease-out;
   width: 260px;
+  z-index: 99;
 }
 
 /* When the deck card is active, the parent screen has this class applied. */
@@ -169,6 +170,45 @@ a:active {
 
 .deck-card-zoomed-in > .deck-card-in {
   transform: scale(1);
+}
+
+.deck-card-controls {
+  list-style: none;
+  left: 50%;
+  margin: 0 0 0 -38px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  /* Hard-coded width and positioning. Would want to do this with JS
+  in real life... or else not center it. */
+  width: 76px;
+  top: 428px;
+}
+.deck-card-controls > li {
+  float: left;
+  margin-left: 10px;
+}
+
+.icon-favorite,
+.icon-not-favorite,
+.icon-info {
+  display: block;
+  height: 28px;
+  text-indent: -32000px;
+  width: 28px;
+}
+
+.icon-favorite {
+  background: url(sprite-y-a.png) 0 -100px no-repeat;
+}
+
+.icon-not-favorite {
+  background: url(sprite-y-a.png) 0 0 no-repeat;
+}
+
+
+.icon-info {
+  background: url(sprite-y-a.png) 0 -200px no-repeat;
 }
 
 .banners {
