@@ -20,6 +20,9 @@
     <div class="demo-mask">
       <div class="demo-status-bar"></div>
       <div class="home-background" style="background-image: url(assets/wallpaper1.jpg); width: 1600px;" id="home-background-1"></div>
+      <div class="rocketbar js-rocketbar-push-left" id="rocketbar">
+        <input type="text" class="rocketbar-input" value="Search for anything&hellip;" />
+      </div><!-- .rocketbar -->
       <ul class="home-screens" id="home-screens">
         <li class="home-screen home-lock-screen">
           <time class="home-time">3:10</time>
@@ -41,20 +44,17 @@
          </div>
         </li>
         <li class="home-screen">
-          <div class="rocketbar" id="rocketbar">
-            <input type="text" class="rocketbar-input" value="Search for anything&hellip;" />
-          </div>
           <img class="demo-app-grid" src="assets/demo/app-grid.png" alt="" />
         </li>
         <li class="home-screen">
-          <div class="deck-card deck-card-zoomed-out">
+          <div class="deck-card">
             <div class="deck-card-in">
               <img src="assets/demo/Clock-1_2.png" alt="" />
             </div>
           </div>
         </li>
         <li class="home-screen">
-          <div class="deck-card deck-card-zoomed-out">
+          <div class="deck-card">
             <div class="deck-card-in">
               <img src="assets/demo/email.jpg" alt="" />
             </div>
@@ -65,7 +65,7 @@
         <li class="home-screen"></li>
         <li class="home-screen"></li>
         <li class="home-screen">Last panel</li>
-      </ul>
+      </ul><!-- .home-screens -->
     </div><!-- .home-mask -->
   </div><!-- .demo-stage -->
   <script type="text/javascript" src="bundle.js"></script>

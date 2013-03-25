@@ -20,13 +20,19 @@ a:active {
   padding: 0 0 0;
   position: absolute;
   width: 2880px;
-  z-index: 50;
 }
+
 .home-screen {
   height: 450px;
   padding-top: 20px;
   position: absolute;
   width: 320px;
+}
+
+.home-screens-has-deck-card-zoomed-in {
+  /* Cover rocketbar when home screen is zoomed in.
+  Apparently CSS transforms trigger new stacking contexts for z-index. */
+  z-index: 99;
 }
 
 .home-lock-screen {
@@ -41,8 +47,7 @@ a:active {
   left: 0;
   top: 0;
   position: absolute;
-  width: ;
-  z-index: 1;
+  z-index: 0;
 }
 
 .home-time {
@@ -128,39 +133,42 @@ a:active {
 }
 
 .demo-app-grid {
-  margin: 10px 0 0 0;
+  margin: 72px 0 0 0;
 }
 
 .deck-card {
-  height: 470px;
-  left: 0;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, .7);
+  border-radius: 8px 0 8px 0;
+  height: 320px;
   overflow: hidden;
+  left: 30px;
   position: absolute;
-  top: 0;
+  top: 96px;
   transition: width 150ms ease-out,
               height 150ms ease-out,
               top 150ms ease-out,
               left 150ms ease-out;
-  width: 320px;
+  width: 260px;
 }
 
-.deck-card-zoomed-out {
-  background: rgba(0, 0, 0, .1);
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, .7);
-  border-radius: 8px 0 8px 0;
-  height: 320px;
-  left: 30px;
-  top: 96px;
-  width: 260px;
+/* When the deck card is active, the parent screen has this class applied. */
+.deck-card-zoomed-in {
+  border-radius: 0;
+  box-shadow: none;
+  height: 470px;
+  left: 0;
+  top: 0;
+  width: 320px;
 }
 
 .deck-card-in {
   transition: transform 150ms ease-out;
   transform-origin: 0 0;
+  transform: scale(0.8125);
 }
 
-.deck-card-zoomed-out > .deck-card-in {
-  transform: scale(0.8125);
+.deck-card-zoomed-in > .deck-card-in {
+  transform: scale(1);
 }
 
 .banners {
@@ -191,5 +199,23 @@ a:active {
 .banner > .subtitle {
   color: #ddd;
   font-weight: normal;
+}
+
+/* RocketBar
+----------------------------------------------------------------------------- */
+
+.rocketbar {
+  left: 0;
+  padding: 30px 30px 0;
+  position: absolute;
+  transition: left 500ms cubic-bezier(0.215, 0.610, 0.355, 1.000);
+  right: 0;
+  top: 0;
+  z-index: 2;
+}
+
+
+.js-rocketbar-push-left {
+  left: 320px
 }
 
