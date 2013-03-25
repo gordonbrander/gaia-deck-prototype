@@ -6,6 +6,7 @@ var fold = require('reducers/fold');
 var filter = require('reducers/filter');
 var map = require('reducers/map');
 var expand = require('reducers/expand');
+var merge = require('reducers/merge');
 var print = require('reducers/debug/print');
 
 var open = require('dom-reduce/event');
@@ -91,7 +92,7 @@ function extend(obj/* obj1, obj2, objN */) {
 function extendState(state, old, update) {
   // This filter is always run first by updateState.
   // Extends state with keys/values from update 
-  return extend(state, update);
+  return extend(state, old, update);
 }
 
 function updateState(old, update, filters) {
@@ -101,7 +102,7 @@ function updateState(old, update, filters) {
   return reduce([extendState].concat(filters), function (state, filter) {
     // Filter functions receive current state, old state and update object.
     return filter(state, old, update);
-  }, Object.create(old));
+  }, {});
 }
 
 function clamp(num, min, max) {
@@ -195,23 +196,27 @@ var cardTapsOverTime = filter(tappedAncestorsOverTime, function isCard(el) {
   return hasClass(el, 'deck-card');
 });
 
-print(cardTapsOverTime);
-
-fold(prevElTapsOverTime, function (event) {
+var prevIndexStatesOverTime = map(prevElTapsOverTime, function (event) {
   event.preventDefault();
-  STATE = render(updateState(STATE, { index: STATE.index - 1 }, STATE_FILTERS));
+  return updateState(STATE, { index: STATE.index - 1 }, STATE_FILTERS);
 });
 
-fold(nextElTapsOverTime, function (event) {
+var nextIndexStatesOverTime = map(nextElTapsOverTime, function (event) {
   event.preventDefault();
-  STATE = render(updateState(STATE, { index: STATE.index + 1 }, STATE_FILTERS));
+  return updateState(STATE, { index: STATE.index + 1 }, STATE_FILTERS);
+});
+
+var statesOverTime = merge([prevIndexStatesOverTime, nextIndexStatesOverTime]);
+
+fold(statesOverTime, function (state) {
+  return STATE = render(state);
 });
 
 fold(cardTapsOverTime, function (el) {
   toggleClass(el, 'deck-card-zoomed-out');
 });
 
-},{"./geneology-reduce.js":2,"reducers/fold":3,"reducers/filter":4,"reducers/map":5,"reducers/expand":6,"reducers/debug/print":7,"dom-reduce/event":8}],2:[function(require,module,exports){
+},{"./geneology-reduce.js":2,"reducers/fold":3,"reducers/filter":4,"reducers/map":5,"reducers/expand":6,"reducers/merge":7,"reducers/debug/print":8,"dom-reduce/event":9}],2:[function(require,module,exports){
 "use strict";
 
 var reducible = require("reducible/reducible");
@@ -231,7 +236,7 @@ function geneology(el, maxDepth) {
 }
 module.exports = geneology;
 
-},{"reducible/reducible":9,"reducible/end":10}],4:[function(require,module,exports){
+},{"reducible/reducible":10,"reducible/end":11}],4:[function(require,module,exports){
 "use strict";
 
 var reducer = require("./reducer")
@@ -254,7 +259,28 @@ var filter = reducer(function filter(predicate, next, value, result) {
 
 module.exports = filter
 
-},{"./reducer":11}],6:[function(require,module,exports){
+},{"./reducer":12}],5:[function(require,module,exports){
+"use strict";
+
+var reducer = require("./reducer")
+
+var map = reducer(function map(f, next, value, result) {
+  /**
+  Returns transformed version of given `source` where each item of it
+  is mapped using `f`.
+
+  ## Example
+
+  var data = [{ name: "foo" }, { name: "bar" }]
+  var names = map(data, function(value) { return value.name })
+  print(names) // => < "foo" "bar" >
+  **/
+  next(f(value), result)
+})
+
+module.exports = map
+
+},{"./reducer":12}],6:[function(require,module,exports){
 "use strict";
 
 var merge = require("./merge")
@@ -281,28 +307,7 @@ function expand(source, f) {
 
 module.exports = expand
 
-},{"./merge":12,"./map":5}],5:[function(require,module,exports){
-"use strict";
-
-var reducer = require("./reducer")
-
-var map = reducer(function map(f, next, value, result) {
-  /**
-  Returns transformed version of given `source` where each item of it
-  is mapped using `f`.
-
-  ## Example
-
-  var data = [{ name: "foo" }, { name: "bar" }]
-  var names = map(data, function(value) { return value.name })
-  print(names) // => < "foo" "bar" >
-  **/
-  next(f(value), result)
-})
-
-module.exports = map
-
-},{"./reducer":11}],13:[function(require,module,exports){
+},{"./merge":7,"./map":5}],13:[function(require,module,exports){
 var events = require('events');
 
 exports.isArray = isArray;
@@ -655,7 +660,7 @@ exports.format = function(f) {
   return str;
 };
 
-},{"events":14}],10:[function(require,module,exports){
+},{"events":14}],11:[function(require,module,exports){
 "use strict";
 
 module.exports = String("End of the collection")
@@ -717,7 +722,59 @@ function fold(source, next, initial) {
 
 module.exports = fold
 
-},{"eventual/type":15,"eventual/deliver":16,"eventual/defer":17,"eventual/when":18,"reducible/reduce":19,"reducible/is-error":20,"reducible/is-reduced":21,"reducible/end":10}],8:[function(require,module,exports){
+},{"eventual/type":15,"eventual/deliver":16,"eventual/defer":17,"eventual/when":18,"reducible/reduce":19,"reducible/is-error":20,"reducible/is-reduced":21,"reducible/end":11}],7:[function(require,module,exports){
+"use strict";
+
+var reduce = require("reducible/reduce")
+var reducible = require("reducible/reducible")
+var end = require("reducible/end")
+var isError = require("reducible/is-error")
+
+function merge(source) {
+  /**
+  Merges given collection of collections to a collection with items of
+  all nested collections. Note that items in the resulting collection
+  are ordered by the time rather then index, in other words if item from
+  the second nested collection is deliver earlier then the item
+  from first nested collection it will in appear earlier in the resulting
+  collection.
+
+  print(merge([ [1, 2], [3, 4] ]))  // => < 1 2 3 4 >
+  **/
+  return reducible(function accumulateMerged(next, initial) {
+    var state = initial
+    var open = 1
+
+    function forward(value) {
+      if (value === end) {
+        open = open - 1
+        if (open === 0) return next(end)
+      } else {
+        state = next(value, state)
+      }
+      return state
+    }
+
+
+    reduce(source, function accumulateMergeSource(nested) {
+      // If there is an error or end of `source` collection just pass it
+      // to `forward` it will take care of detecting weather it's error
+      // or `end`. In later case it will also figure out if it's `end` of
+      // result to and act appropriately.
+      if (nested === end) return forward(end)
+      if (isError(nested)) return forward(nested)
+      // If `nested` item is not end nor error just `accumulate` it via
+      // `forward` that keeps track of all collections that are bing forwarded
+      // to it.
+      open = open + 1
+      reduce(nested, forward, null)
+    }, initial)
+  })
+}
+
+module.exports = merge
+
+},{"reducible/reduce":19,"reducible/reducible":10,"reducible/end":11,"reducible/is-error":20}],9:[function(require,module,exports){
 /* vim:set ts=2 sw=2 sts=2 expandtab */
 /*jshint asi: true undef: true es5: true node: true browser: true devel: true
          forin: true latedef: false globalstrict: true */
@@ -758,7 +815,7 @@ function open(target, type, options) {
 
 module.exports = open
 
-},{"reducible/reducible":9,"reducible/is-reduced":21}],9:[function(require,module,exports){
+},{"reducible/reducible":10,"reducible/is-reduced":21}],10:[function(require,module,exports){
 (function(){"use strict";
 
 var reduce = require("./reduce")
@@ -848,7 +905,7 @@ reducible.type = Reducible
 module.exports = reducible
 
 })()
-},{"./reduce":19,"./end":10,"./is-error":20,"./is-reduced":21,"./reduced":22}],16:[function(require,module,exports){
+},{"./reduce":19,"./end":11,"./is-error":20,"./is-reduced":21,"./reduced":22}],16:[function(require,module,exports){
 "use strict";
 
 // Anyone crating an eventual will likely need to realize it, requiring
@@ -1133,7 +1190,7 @@ function reduced(value) {
 
 module.exports = reduced
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 (function(process){"use strict";
 
 var reduce = require("reducible/reduce")
@@ -1181,7 +1238,7 @@ function print(source) {
 module.exports = print
 
 })(require("__browserify_process"))
-},{"util":13,"reducible/reduce":19,"reducible/reducible":9,"reducible/end":10,"reducible/is-error":20,"__browserify_process":24}],21:[function(require,module,exports){
+},{"util":13,"reducible/reducible":10,"reducible/reduce":19,"reducible/end":11,"reducible/is-error":20,"__browserify_process":24}],21:[function(require,module,exports){
 "use strict";
 
 var reduced = require("./reduced")
@@ -1352,7 +1409,7 @@ when.define(Eventual, function(value, onRealize, onError) {
 module.exports = Eventual
 
 })()
-},{"pending/await":25,"pending/is":26,"./deliver":16,"./when":18,"watchables/watchers":27,"watchables/watch":28}],11:[function(require,module,exports){
+},{"pending/await":25,"pending/is":26,"./deliver":16,"./when":18,"watchables/watchers":27,"watchables/watch":28}],12:[function(require,module,exports){
 (function(process){"use strict";
 
 var reduce = require("reducible/reduce")
@@ -1406,59 +1463,7 @@ function reducer(process) {
 module.exports = reducer
 
 })(require("__browserify_process"))
-},{"reducible/reduce":19,"reducible/reducible":9,"reducible/is-error":20,"reducible/end":10,"__browserify_process":24}],12:[function(require,module,exports){
-"use strict";
-
-var reduce = require("reducible/reduce")
-var reducible = require("reducible/reducible")
-var end = require("reducible/end")
-var isError = require("reducible/is-error")
-
-function merge(source) {
-  /**
-  Merges given collection of collections to a collection with items of
-  all nested collections. Note that items in the resulting collection
-  are ordered by the time rather then index, in other words if item from
-  the second nested collection is deliver earlier then the item
-  from first nested collection it will in appear earlier in the resulting
-  collection.
-
-  print(merge([ [1, 2], [3, 4] ]))  // => < 1 2 3 4 >
-  **/
-  return reducible(function accumulateMerged(next, initial) {
-    var state = initial
-    var open = 1
-
-    function forward(value) {
-      if (value === end) {
-        open = open - 1
-        if (open === 0) return next(end)
-      } else {
-        state = next(value, state)
-      }
-      return state
-    }
-
-
-    reduce(source, function accumulateMergeSource(nested) {
-      // If there is an error or end of `source` collection just pass it
-      // to `forward` it will take care of detecting weather it's error
-      // or `end`. In later case it will also figure out if it's `end` of
-      // result to and act appropriately.
-      if (nested === end) return forward(end)
-      if (isError(nested)) return forward(nested)
-      // If `nested` item is not end nor error just `accumulate` it via
-      // `forward` that keeps track of all collections that are bing forwarded
-      // to it.
-      open = open + 1
-      reduce(nested, forward, null)
-    }, initial)
-  })
-}
-
-module.exports = merge
-
-},{"reducible/reduce":19,"reducible/reducible":9,"reducible/end":10,"reducible/is-error":20}],19:[function(require,module,exports){
+},{"reducible/reduce":19,"reducible/reducible":10,"reducible/is-error":20,"reducible/end":11,"__browserify_process":24}],19:[function(require,module,exports){
 "use strict";
 
 var method = require("method")
@@ -1519,7 +1524,7 @@ reduce.define(reduce.singular)
 reduce.define(Error, function(error, next) { next(error) })
 module.exports = reduce
 
-},{"./is-reduced":21,"./is-error":20,"./end":10,"method":29}],18:[function(require,module,exports){
+},{"./is-reduced":21,"./is-error":20,"./end":11,"method":29}],18:[function(require,module,exports){
 "use strict";
 
 var method = require("method")
