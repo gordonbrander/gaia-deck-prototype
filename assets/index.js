@@ -24,11 +24,6 @@ function hasClass(el, classname) {
   return el.classList && el.classList.contains(classname);
 }
 
-function toggleClass(el, classname) {
-  el.classList.toggle(classname);
-  return el;
-}
-
 function liftEventTarget(lambda) {
   return function liftedForEventTarget(event) {
     return lambda(event.target);
@@ -141,6 +136,14 @@ function render(state) {
   var cappedScreenIndex = Math.max(state.index, 1);
   state.screenEls[cappedScreenIndex].appendChild(state.rocketbarEl);
 
+  reduce(state.cardEls, function activateEl(activeCardEl, cardEl) {
+    activeCardEl === cardEl ?
+      cardEl.classList.remove('deck-card-zoomed-out') :
+      cardEl.classList.add('deck-card-zoomed-out');
+
+    return activeCardEl;
+  }, state.activeCardEl);
+
   return state;
 }
 
@@ -163,6 +166,7 @@ var bg1El = document.getElementById('home-background-1');
 var nextEl = document.getElementById('demo-next');
 var prevEl = document.getElementById('demo-prev');
 var rocketbarEl = document.getElementById('rocketbar');
+var cardEls = document.getElementsByClassName('deck-card');
 
 var STATE = updateState({}, {
   index: 0,
@@ -172,7 +176,9 @@ var STATE = updateState({}, {
   screensEl: homeScreensEl,
   screenEls: homeScreensEl.children,
   backgroundEl: bg1El,
-  rocketbarEl: rocketbarEl
+  rocketbarEl: rocketbarEl,
+  activeCardEl: null,
+  cardEls: cardEls
 }, STATE_FILTERS);
 
 // Set up stage.
@@ -196,10 +202,20 @@ var nextElTapsOverTime = filter(tapStartsOverTime, liftEventTarget(function isNe
   return el === nextEl;
 }));
 
+// Find geneology of tapped elements -- crawls up the dom
+// finding ancestors of element (including element itself)
+// Expand into flat list.
 var tappedAncestorsOverTime = expand(tappedElsOverTime, geneology);
 
+// Filter down to only card taps
 var cardTapsOverTime = filter(tappedAncestorsOverTime, function isCard(el) {
   return hasClass(el, 'deck-card');
+});
+
+var activeCardStatesOverTime = map(cardTapsOverTime, function (el) {
+  return updateState(STATE, {
+    activeCardEl: STATE.activeCardEl === el ? null : el
+  }, STATE_FILTERS);
 });
 
 var prevIndexStatesOverTime = map(prevElTapsOverTime, function (event) {
@@ -212,12 +228,13 @@ var nextIndexStatesOverTime = map(nextElTapsOverTime, function (event) {
   return updateState(STATE, { index: STATE.index + 1 }, STATE_FILTERS);
 });
 
-var statesOverTime = merge([prevIndexStatesOverTime, nextIndexStatesOverTime]);
+var statesOverTime = merge([
+  prevIndexStatesOverTime,
+  nextIndexStatesOverTime,
+  activeCardStatesOverTime
+]);
 
 fold(statesOverTime, function (state) {
   return STATE = render(state);
 });
 
-fold(cardTapsOverTime, function (el) {
-  toggleClass(el, 'deck-card-zoomed-out');
-});
