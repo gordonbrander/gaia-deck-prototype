@@ -108,6 +108,20 @@ function clamp(num, min, max) {
   return (num < min) ? min : Math.min(num, max);
 }
 
+function reduceActivateCardEl(state, cardEl) {
+  var activeCardEl = state.activeCardEl;
+  var screensEl = state.screensEl;
+
+  if (activeCardEl === cardEl) {
+    cardEl.classList.add('deck-card-zoomed-in');
+  }
+  else {
+    cardEl.classList.remove('deck-card-zoomed-in');
+  }
+
+  return state;
+}
+
 var STATE_FILTERS = [
   function clampIndex(state, old, update) {
     return extend(state, {
@@ -123,6 +137,12 @@ var STATE_FILTERS = [
     return extend(state, {
       totalWidth: state.units * state.unitWidth
     });
+  },
+  function updateCardStatus(state, old, update) {
+    // If a card has just been tapped, update the state.
+    return update.activeCardEl ? extend(state, {
+      activeCardEl: update.activeCardEl === old.activeCardEl ? null : update.activeCardEl
+    }) : state;
   }
 ];
 
@@ -134,15 +154,21 @@ function render(state) {
 
   // Append RocketBar to active screen (but not lock screen)
   var cappedScreenIndex = Math.max(state.index, 1);
-  state.screenEls[cappedScreenIndex].appendChild(state.rocketbarEl);
 
-  reduce(state.cardEls, function activateEl(activeCardEl, cardEl) {
-    activeCardEl === cardEl ?
-      cardEl.classList.remove('deck-card-zoomed-out') :
-      cardEl.classList.add('deck-card-zoomed-out');
+  var rocketbarEl = state.rocketbarEl;
+  state.index === 0 ?
+    rocketbarEl.classList.add('js-rocketbar-push-left') :
+    rocketbarEl.classList.remove('js-rocketbar-push-left');
 
-    return activeCardEl;
-  }, state.activeCardEl);
+  // Toggle classes for activated cards.
+  reduce(state.cardEls, reduceActivateCardEl, state);
+
+  // Add class to .home-screens for toggled cards. Apparently
+  // CSS transforms trigger new stacking contexts for z-index.
+  var screensElClassList = state.screensEl.classList;
+  state.activeCardEl ?
+    screensElClassList.add('home-screens-has-deck-card-zoomed-in') :
+    screensElClassList.remove('home-screens-has-deck-card-zoomed-in');
 
   return state;
 }
@@ -214,7 +240,7 @@ var cardTapsOverTime = filter(tappedAncestorsOverTime, function isCard(el) {
 
 var activeCardStatesOverTime = map(cardTapsOverTime, function (el) {
   return updateState(STATE, {
-    activeCardEl: STATE.activeCardEl === el ? null : el
+    activeCardEl: el
   }, STATE_FILTERS);
 });
 
