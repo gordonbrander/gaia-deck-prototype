@@ -5,6 +5,7 @@ var fold = require('reducers/fold');
 var filter = require('reducers/filter');
 var map = require('reducers/map');
 var expand = require('reducers/expand');
+var merge = require('reducers/merge');
 var print = require('reducers/debug/print');
 
 var open = require('dom-reduce/event');
@@ -90,7 +91,7 @@ function extend(obj/* obj1, obj2, objN */) {
 function extendState(state, old, update) {
   // This filter is always run first by updateState.
   // Extends state with keys/values from update 
-  return extend(state, update);
+  return extend(state, old, update);
 }
 
 function updateState(old, update, filters) {
@@ -100,7 +101,7 @@ function updateState(old, update, filters) {
   return reduce([extendState].concat(filters), function (state, filter) {
     // Filter functions receive current state, old state and update object.
     return filter(state, old, update);
-  }, Object.create(old));
+  }, {});
 }
 
 function clamp(num, min, max) {
@@ -194,16 +195,20 @@ var cardTapsOverTime = filter(tappedAncestorsOverTime, function isCard(el) {
   return hasClass(el, 'deck-card');
 });
 
-print(cardTapsOverTime);
-
-fold(prevElTapsOverTime, function (event) {
+var prevIndexStatesOverTime = map(prevElTapsOverTime, function (event) {
   event.preventDefault();
-  STATE = render(updateState(STATE, { index: STATE.index - 1 }, STATE_FILTERS));
+  return updateState(STATE, { index: STATE.index - 1 }, STATE_FILTERS);
 });
 
-fold(nextElTapsOverTime, function (event) {
+var nextIndexStatesOverTime = map(nextElTapsOverTime, function (event) {
   event.preventDefault();
-  STATE = render(updateState(STATE, { index: STATE.index + 1 }, STATE_FILTERS));
+  return updateState(STATE, { index: STATE.index + 1 }, STATE_FILTERS);
+});
+
+var statesOverTime = merge([prevIndexStatesOverTime, nextIndexStatesOverTime]);
+
+fold(statesOverTime, function (state) {
+  return STATE = render(state);
 });
 
 fold(cardTapsOverTime, function (el) {
