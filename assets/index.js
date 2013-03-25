@@ -136,6 +136,11 @@ function render(state) {
 
   var backgroundOffset = syncParallax(state.offset, state.totalWidth, state.backgroundWidth, state.unitWidth);
   state.backgroundEl.style.transform = "translateX(-" + backgroundOffset + "px";
+
+  // Append RocketBar to active screen (but not lock screen)
+  var cappedScreenIndex = Math.max(state.index, 1);
+  state.screenEls[cappedScreenIndex].appendChild(state.rocketbarEl);
+
   return state;
 }
 
@@ -157,6 +162,7 @@ var homeScreensEl = document.getElementById('home-screens');
 var bg1El = document.getElementById('home-background-1');
 var nextEl = document.getElementById('demo-next');
 var prevEl = document.getElementById('demo-prev');
+var rocketbarEl = document.getElementById('rocketbar');
 
 var STATE = updateState({}, {
   index: 0,
@@ -165,7 +171,8 @@ var STATE = updateState({}, {
   backgroundWidth: bg1El.clientWidth,
   screensEl: homeScreensEl,
   screenEls: homeScreensEl.children,
-  backgroundEl: bg1El
+  backgroundEl: bg1El,
+  rocketbarEl: rocketbarEl
 }, STATE_FILTERS);
 
 // Set up stage.
