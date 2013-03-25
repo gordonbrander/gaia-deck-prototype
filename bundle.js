@@ -25,11 +25,6 @@ function hasClass(el, classname) {
   return el.classList && el.classList.contains(classname);
 }
 
-function toggleClass(el, classname) {
-  el.classList.toggle(classname);
-  return el;
-}
-
 function liftEventTarget(lambda) {
   return function liftedForEventTarget(event) {
     return lambda(event.target);
@@ -114,6 +109,20 @@ function clamp(num, min, max) {
   return (num < min) ? min : Math.min(num, max);
 }
 
+function reduceActivateCardEl(state, cardEl) {
+  var activeCardEl = state.activeCardEl;
+  var screensEl = state.screensEl;
+
+  if (activeCardEl === cardEl) {
+    cardEl.classList.add('deck-card-zoomed-in');
+  }
+  else {
+    cardEl.classList.remove('deck-card-zoomed-in');
+  }
+
+  return state;
+}
+
 var STATE_FILTERS = [
   function clampIndex(state, old, update) {
     return extend(state, {
@@ -129,6 +138,12 @@ var STATE_FILTERS = [
     return extend(state, {
       totalWidth: state.units * state.unitWidth
     });
+  },
+  function updateCardStatus(state, old, update) {
+    // If a card has just been tapped, update the state.
+    return update.activeCardEl ? extend(state, {
+      activeCardEl: update.activeCardEl === old.activeCardEl ? null : update.activeCardEl
+    }) : state;
   }
 ];
 
@@ -137,6 +152,25 @@ function render(state) {
 
   var backgroundOffset = syncParallax(state.offset, state.totalWidth, state.backgroundWidth, state.unitWidth);
   state.backgroundEl.style.transform = "translateX(-" + backgroundOffset + "px";
+
+  // Append RocketBar to active screen (but not lock screen)
+  var cappedScreenIndex = Math.max(state.index, 1);
+
+  var rocketbarEl = state.rocketbarEl;
+  state.index === 0 ?
+    rocketbarEl.classList.add('js-rocketbar-push-left') :
+    rocketbarEl.classList.remove('js-rocketbar-push-left');
+
+  // Toggle classes for activated cards.
+  reduce(state.cardEls, reduceActivateCardEl, state);
+
+  // Add class to .home-screens for toggled cards. Apparently
+  // CSS transforms trigger new stacking contexts for z-index.
+  var screensElClassList = state.screensEl.classList;
+  state.activeCardEl ?
+    screensElClassList.add('home-screens-has-deck-card-zoomed-in') :
+    screensElClassList.remove('home-screens-has-deck-card-zoomed-in');
+
   return state;
 }
 
@@ -158,6 +192,8 @@ var homeScreensEl = document.getElementById('home-screens');
 var bg1El = document.getElementById('home-background-1');
 var nextEl = document.getElementById('demo-next');
 var prevEl = document.getElementById('demo-prev');
+var rocketbarEl = document.getElementById('rocketbar');
+var cardEls = document.getElementsByClassName('deck-card');
 
 var STATE = updateState({}, {
   index: 0,
@@ -166,7 +202,10 @@ var STATE = updateState({}, {
   backgroundWidth: bg1El.clientWidth,
   screensEl: homeScreensEl,
   screenEls: homeScreensEl.children,
-  backgroundEl: bg1El
+  backgroundEl: bg1El,
+  rocketbarEl: rocketbarEl,
+  activeCardEl: null,
+  cardEls: cardEls
 }, STATE_FILTERS);
 
 // Set up stage.
@@ -190,10 +229,20 @@ var nextElTapsOverTime = filter(tapStartsOverTime, liftEventTarget(function isNe
   return el === nextEl;
 }));
 
+// Find geneology of tapped elements -- crawls up the dom
+// finding ancestors of element (including element itself)
+// Expand into flat list.
 var tappedAncestorsOverTime = expand(tappedElsOverTime, geneology);
 
+// Filter down to only card taps
 var cardTapsOverTime = filter(tappedAncestorsOverTime, function isCard(el) {
   return hasClass(el, 'deck-card');
+});
+
+var activeCardStatesOverTime = map(cardTapsOverTime, function (el) {
+  return updateState(STATE, {
+    activeCardEl: el
+  }, STATE_FILTERS);
 });
 
 var prevIndexStatesOverTime = map(prevElTapsOverTime, function (event) {
@@ -206,15 +255,16 @@ var nextIndexStatesOverTime = map(nextElTapsOverTime, function (event) {
   return updateState(STATE, { index: STATE.index + 1 }, STATE_FILTERS);
 });
 
-var statesOverTime = merge([prevIndexStatesOverTime, nextIndexStatesOverTime]);
+var statesOverTime = merge([
+  prevIndexStatesOverTime,
+  nextIndexStatesOverTime,
+  activeCardStatesOverTime
+]);
 
 fold(statesOverTime, function (state) {
   return STATE = render(state);
 });
 
-fold(cardTapsOverTime, function (el) {
-  toggleClass(el, 'deck-card-zoomed-out');
-});
 
 },{"./geneology-reduce.js":2,"reducers/fold":3,"reducers/filter":4,"reducers/map":5,"reducers/expand":6,"reducers/merge":7,"reducers/debug/print":8,"dom-reduce/event":9}],2:[function(require,module,exports){
 "use strict";
@@ -1238,7 +1288,7 @@ function print(source) {
 module.exports = print
 
 })(require("__browserify_process"))
-},{"util":13,"reducible/reducible":10,"reducible/reduce":19,"reducible/end":11,"reducible/is-error":20,"__browserify_process":24}],21:[function(require,module,exports){
+},{"util":13,"reducible/reduce":19,"reducible/reducible":10,"reducible/end":11,"reducible/is-error":20,"__browserify_process":24}],21:[function(require,module,exports){
 "use strict";
 
 var reduced = require("./reduced")
@@ -2022,7 +2072,19 @@ watch.define(function(value, watcher) {
 
 module.exports = watch
 
-},{"./watchers":27,"method":30}],26:[function(require,module,exports){
+},{"./watchers":27,"method":30}],25:[function(require,module,exports){
+"use strict";
+
+var method = require("method")
+
+// Set's up a callback to be called once pending
+// value is realized. All object by default are realized.
+var await = method("await")
+await.define(function(value, callback) { callback(value) })
+
+module.exports = await
+
+},{"method":30}],26:[function(require,module,exports){
 "use strict";
 
 var method = require("method")
@@ -2035,18 +2097,6 @@ var isPending = method("is-pending")
 isPending.define(function() { return false })
 
 module.exports = isPending
-
-},{"method":30}],25:[function(require,module,exports){
-"use strict";
-
-var method = require("method")
-
-// Set's up a callback to be called once pending
-// value is realized. All object by default are realized.
-var await = method("await")
-await.define(function(value, callback) { callback(value) })
-
-module.exports = await
 
 },{"method":30}],23:[function(require,module,exports){
 "use strict";
