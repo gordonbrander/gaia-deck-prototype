@@ -86,10 +86,17 @@ a:active {
 }
 
 .demo-phone-frame {
-  background: url(phone-frame.png);
+  background: url(phone-frame.png) 0 0 no-repeat;
   height: 708px;
   position: absolute;
   width: 356px;
+}
+.demo-phone-frame-right-edge {
+  background: url(phone-frame.png) right 0 no-repeat;
+  height: 708px;
+  left: 337px;
+  position: absolute;
+  width: 19px;
   z-index: 100;
 }
 
@@ -140,7 +147,7 @@ a:active {
 .deck-card-zoomed-out {
   background: rgba(0, 0, 0, .1);
   box-shadow: 1px 1px 3px rgba(0, 0, 0, .7);
-  border-radius: 8px;
+  border-radius: 8px 0 8px 0;
   height: 320px;
   left: 30px;
   top: 96px;
