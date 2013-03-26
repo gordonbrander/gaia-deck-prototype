@@ -133,9 +133,9 @@ a:active {
 
 .demo-prev,
 .demo-next {
-  bottom: 0;
+  height: 450px;
   position: absolute;
-  top: 0;
+  top: 134px;
   width: 60px;
   z-index: 98;
 }
