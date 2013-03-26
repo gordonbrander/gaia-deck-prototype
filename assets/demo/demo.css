@@ -201,18 +201,18 @@ a:active {
 .deck-card-controls {
   list-style: none;
   left: 50%;
-  margin: 0 0 0 -38px;
+  margin: 0 0 0 -40px;
   overflow: hidden;
   padding: 0;
   position: absolute;
-  /* Hard-coded width and positioning. Would want to do this with JS
+  /* @FIXME Hard-coded width and positioning. Would want to do this with JS
   in real life... or else not center it. */
-  width: 76px;
-  top: 428px;
+  width: 80px;
+  top: 432px;
 }
 .deck-card-controls > li {
   float: left;
-  margin-left: 10px;
+  margin: 0 6px;
 }
 
 /* Icons
