@@ -106,6 +106,14 @@ a:active {
   top: 114px;
   width: 3000px;
 }
+.demo-mask-cover {
+  height: 480px;
+  left: 356px;
+  position: absolute;
+  top: 114px;
+  width: 3000px;
+  z-index: 999;
+}
 
 .demo-matte {
   background: #000;
@@ -201,18 +209,18 @@ a:active {
 .deck-card-controls {
   list-style: none;
   left: 50%;
-  margin: 0 0 0 -38px;
+  margin: 0 0 0 -40px;
   overflow: hidden;
   padding: 0;
   position: absolute;
-  /* Hard-coded width and positioning. Would want to do this with JS
+  /* @FIXME Hard-coded width and positioning. Would want to do this with JS
   in real life... or else not center it. */
-  width: 76px;
-  top: 428px;
+  width: 80px;
+  top: 432px;
 }
 .deck-card-controls > li {
   float: left;
-  margin-left: 10px;
+  margin: 0 6px;
 }
 
 /* Icons
@@ -381,7 +389,7 @@ a:active {
 
 .rocketbar-faux-input {
   background: #fff url(sprite-y-a.png) 0 -300px no-repeat;
-  border-radius: 8px;
+  border-radius: 8px 0 8px 0;
   box-shadow: inset 1px 1px 1px rgba(0, 0, 0, .2),
               0 0 0 1px rgba(0, 0, 0, .3),
               1px 1px 0 1px rgba(255, 255, 255, .2);
@@ -394,6 +402,7 @@ a:active {
 .rocketbar-input {
   background: transparent;
   display: block;
+  font-size: 16px;
   border: 0;
   height: 23px;
   padding: 7px 0 6px;
