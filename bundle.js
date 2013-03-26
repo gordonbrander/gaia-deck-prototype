@@ -165,10 +165,9 @@ function render(state) {
 
   // Add class to .home-screens for toggled cards. Apparently
   // CSS transforms trigger new stacking contexts for z-index.
-  var screensElClassList = state.screensEl.classList;
   state.activeCardEl ?
-    screensElClassList.add('home-screens-has-deck-card-zoomed-in') :
-    screensElClassList.remove('home-screens-has-deck-card-zoomed-in');
+    stageEl.classList.add('state-deck-card-zoomed-in') :
+    stageEl.classList.remove('state-deck-card-zoomed-in');
 
   return state;
 }
@@ -865,7 +864,24 @@ function open(target, type, options) {
 
 module.exports = open
 
-},{"reducible/reducible":10,"reducible/is-reduced":21}],10:[function(require,module,exports){
+},{"reducible/reducible":10,"reducible/is-reduced":21}],16:[function(require,module,exports){
+"use strict";
+
+// Anyone crating an eventual will likely need to realize it, requiring
+// dependency on other package is complicated, not to mention that one
+// can easily wind up with several copies that does not necessary play
+// well with each other. Exposing this solves the issues.
+module.exports = require("pending/deliver")
+
+},{"pending/deliver":22}],17:[function(require,module,exports){
+"use strict";
+
+var Eventual = require("./type")
+var defer = function defer() { return new Eventual() }
+
+module.exports = defer
+
+},{"./type":15}],10:[function(require,module,exports){
 (function(){"use strict";
 
 var reduce = require("./reduce")
@@ -955,24 +971,7 @@ reducible.type = Reducible
 module.exports = reducible
 
 })()
-},{"./reduce":19,"./end":11,"./is-error":20,"./is-reduced":21,"./reduced":22}],16:[function(require,module,exports){
-"use strict";
-
-// Anyone crating an eventual will likely need to realize it, requiring
-// dependency on other package is complicated, not to mention that one
-// can easily wind up with several copies that does not necessary play
-// well with each other. Exposing this solves the issues.
-module.exports = require("pending/deliver")
-
-},{"pending/deliver":23}],17:[function(require,module,exports){
-"use strict";
-
-var Eventual = require("./type")
-var defer = function defer() { return new Eventual() }
-
-module.exports = defer
-
-},{"./type":15}],24:[function(require,module,exports){
+},{"./reduce":19,"./end":11,"./is-error":20,"./is-reduced":21,"./reduced":23}],24:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -1223,7 +1222,7 @@ function isError(value) {
 
 module.exports = isError
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 
 
@@ -1288,7 +1287,7 @@ function print(source) {
 module.exports = print
 
 })(require("__browserify_process"))
-},{"util":13,"reducible/reduce":19,"reducible/end":11,"reducible/reducible":10,"reducible/is-error":20,"__browserify_process":24}],21:[function(require,module,exports){
+},{"util":13,"reducible/reduce":19,"reducible/reducible":10,"reducible/end":11,"reducible/is-error":20,"__browserify_process":24}],21:[function(require,module,exports){
 "use strict";
 
 var reduced = require("./reduced")
@@ -1299,7 +1298,7 @@ function isReduced(value) {
 
 module.exports = isReduced
 
-},{"./reduced":22}],15:[function(require,module,exports){
+},{"./reduced":23}],15:[function(require,module,exports){
 (function(){"use strict";
 
 var watchers = require("watchables/watchers")
@@ -2072,7 +2071,19 @@ watch.define(function(value, watcher) {
 
 module.exports = watch
 
-},{"./watchers":27,"method":30}],26:[function(require,module,exports){
+},{"./watchers":27,"method":30}],25:[function(require,module,exports){
+"use strict";
+
+var method = require("method")
+
+// Set's up a callback to be called once pending
+// value is realized. All object by default are realized.
+var await = method("await")
+await.define(function(value, callback) { callback(value) })
+
+module.exports = await
+
+},{"method":30}],26:[function(require,module,exports){
 "use strict";
 
 var method = require("method")
@@ -2086,19 +2097,7 @@ isPending.define(function() { return false })
 
 module.exports = isPending
 
-},{"method":30}],25:[function(require,module,exports){
-"use strict";
-
-var method = require("method")
-
-// Set's up a callback to be called once pending
-// value is realized. All object by default are realized.
-var await = method("await")
-await.define(function(value, callback) { callback(value) })
-
-module.exports = await
-
-},{"method":30}],23:[function(require,module,exports){
+},{"method":30}],22:[function(require,module,exports){
 "use strict";
 
 var method = require("method")
