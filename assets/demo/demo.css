@@ -137,7 +137,7 @@ a:active {
   position: absolute;
   top: 0;
   width: 60px;
-  z-index: 999;
+  z-index: 98;
 }
 
 .demo-prev {
@@ -279,7 +279,7 @@ a:active {
   bottom: 10px;
   /* @FIXME hard coded for demo */
   width: 320px;
-  z-index: 100;
+  z-index: 97;
 }
 
 .state-index-0 .notification-tray {
