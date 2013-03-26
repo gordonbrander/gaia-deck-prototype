@@ -159,7 +159,7 @@ a:active {
 }
 
 .demo-app-grid {
-  margin: 72px 0 0 0;
+  margin: 80px 0 0 0;
 }
 
 .deck-card {
@@ -169,7 +169,7 @@ a:active {
   overflow: hidden;
   left: 30px;
   position: absolute;
-  top: 96px;
+  top: 102px;
   transition: width 150ms ease-out,
               height 150ms ease-out,
               top 150ms ease-out,
@@ -272,16 +272,37 @@ a:active {
 
 .rocketbar {
   left: 0;
-  padding: 30px 30px 0;
+  padding: 36px 12px 0;
   position: absolute;
   transition: left 500ms cubic-bezier(0.215, 0.610, 0.355, 1.000);
   right: 0;
   top: 0;
+  width: 296px;
   z-index: 2;
 }
 
-
 .js-rocketbar-push-left {
   left: 320px
+}
+
+.rocketbar-faux-input {
+  background: #fff url(sprite-y-a.png) 0 -300px no-repeat;
+  border-radius: 8px;
+  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, .2),
+              0 0 0 1px rgba(0, 0, 0, .3),
+              1px 1px 0 1px rgba(255, 255, 255, .2);
+  display: block;
+  height: 36px;
+  position: relative;
+  padding: 0 10px 0 36px;
+  width: -moz-calc(100% - 46px);
+}
+.rocketbar-input {
+  background: transparent;
+  display: block;
+  border: 0;
+  height: 23px;
+  padding: 7px 0 6px;
+  width: 100%;
 }
 
