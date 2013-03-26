@@ -157,8 +157,8 @@ a:active {
 }
 
 .demo-status-bar {
-  background: url(status-bar.png);
-  height: 25px;
+  background: url(status-bar.png) 0 0 no-repeat;
+  height: 22px;
   left: 0;
   position: absolute;
   top: 0;
