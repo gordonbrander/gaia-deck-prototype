@@ -267,7 +267,7 @@ a:active {
 /* Notifications
 ----------------------------------------------------------------------------- */
 
-.notifications {
+.notification-tray {
   bottom: 10px;
   /* @FIXME hard coded for demo */
   height: 0;
@@ -282,7 +282,7 @@ a:active {
   z-index: 100;
 }
 
-.state-index-0 .notifications {
+.state-index-0 .notification-tray {
   /* @FIXME Hard coded for demo to animate bottom property. */
   height: 129px;
   opacity: 1;
