@@ -156,10 +156,9 @@ function render(state) {
   // Append RocketBar to active screen (but not lock screen)
   var cappedScreenIndex = Math.max(state.index, 1);
 
-  var rocketbarEl = state.rocketbarEl;
-  state.index === 0 ?
-    rocketbarEl.classList.add('js-rocketbar-push-left') :
-    rocketbarEl.classList.remove('js-rocketbar-push-left');
+  // Set top-level class indicating panel state.
+  var stageEl = state.stageEl;
+  stageEl.className = stageEl.className.replace(/state-index-\d/, 'state-index-' + state.index);
 
   // Toggle classes for activated cards.
   reduce(state.cardEls, reduceActivateCardEl, state);
@@ -203,6 +202,7 @@ var STATE = updateState({}, {
   screensEl: homeScreensEl,
   screenEls: homeScreensEl.children,
   backgroundEl: bg1El,
+  stageEl: stageEl,
   rocketbarEl: rocketbarEl,
   activeCardEl: null,
   cardEls: cardEls
@@ -1288,7 +1288,7 @@ function print(source) {
 module.exports = print
 
 })(require("__browserify_process"))
-},{"util":13,"reducible/reduce":19,"reducible/reducible":10,"reducible/end":11,"reducible/is-error":20,"__browserify_process":24}],21:[function(require,module,exports){
+},{"util":13,"reducible/reduce":19,"reducible/end":11,"reducible/reducible":10,"reducible/is-error":20,"__browserify_process":24}],21:[function(require,module,exports){
 "use strict";
 
 var reduced = require("./reduced")
@@ -2072,19 +2072,7 @@ watch.define(function(value, watcher) {
 
 module.exports = watch
 
-},{"./watchers":27,"method":30}],25:[function(require,module,exports){
-"use strict";
-
-var method = require("method")
-
-// Set's up a callback to be called once pending
-// value is realized. All object by default are realized.
-var await = method("await")
-await.define(function(value, callback) { callback(value) })
-
-module.exports = await
-
-},{"method":30}],26:[function(require,module,exports){
+},{"./watchers":27,"method":30}],26:[function(require,module,exports){
 "use strict";
 
 var method = require("method")
@@ -2097,6 +2085,18 @@ var isPending = method("is-pending")
 isPending.define(function() { return false })
 
 module.exports = isPending
+
+},{"method":30}],25:[function(require,module,exports){
+"use strict";
+
+var method = require("method")
+
+// Set's up a callback to be called once pending
+// value is realized. All object by default are realized.
+var await = method("await")
+await.define(function(value, callback) { callback(value) })
+
+module.exports = await
 
 },{"method":30}],23:[function(require,module,exports){
 "use strict";
