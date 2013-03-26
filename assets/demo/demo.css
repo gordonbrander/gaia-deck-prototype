@@ -83,7 +83,7 @@ a:active {
   font-weight: normal;
   height: 72px;
   line-height: 72px;
-  padding-top: 38px;
+  padding-top: 75px;
   text-align: center;
   text-shadow: 0px 1px 3px rgba(0, 0, 0, .7);
 }
@@ -215,33 +215,63 @@ a:active {
   margin-left: 10px;
 }
 
+/* Icons
+----------------------------------------------------------------------------- */
+
 .icon-favorite,
 .icon-not-favorite,
-.icon-info {
+.icon-info,
+.icon-email,
+.icon-facebook,
+.icon-messages {
   display: block;
-  height: 28px;
   text-indent: -32000px;
-  width: 28px;
 }
 
 .icon-favorite {
   background: url(sprite-y-a.png) 0 -100px no-repeat;
+  height: 28px;
+  width: 28px;
 }
 
 .icon-not-favorite {
   background: url(sprite-y-a.png) 0 0 no-repeat;
+  height: 28px;
+  width: 28px;
 }
-
 
 .icon-info {
   background: url(sprite-y-a.png) 0 -200px no-repeat;
+  height: 28px;
+  width: 28px;
 }
+
+.icon-email,
+.icon-facebook,
+.icon-messages {
+  background: url(sprite-y-a.png);
+  height: 30px;
+  width: 30px;
+}
+
+.icon-email {
+  background-position: 0 -500px;
+}
+.icon-messages {
+  background-position: 0 -400px;
+}
+.icon-facebook {
+  background-position: 0 -600px;
+}
+
+/* Notifications
+----------------------------------------------------------------------------- */
 
 .notifications {
   bottom: 0;
   left: 0;
   position: absolute;
-  transition: opacity 300ms ease-out;
+  transition: opacity 300ms cubic-bezier(0.215, 0.610, 0.355, 1.000);
   right: 0;
 }
 
@@ -251,21 +281,32 @@ a:active {
 
 .notification {
   background: rgba(0, 0, 0, .25);
-  height: 42px;
+  height: 36px;
   margin-top: 1px;
-  padding: 6px 6px 0 6px;
+  padding: 6px 6px 0 42px;
+  position: relative;
+}
+
+.notification > .icon {
+  left: 6px;
+  position: absolute;
+  top: 6px;
 }
 
 .notification > .title,
 .notification > .subtitle {
   font-size: 12px;
-  line-height: 18px;
+  line-height: 14px;
   margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .notification > .title {
   color: #fff;
   font-weight: bold;
+  margin-bottom: 2px;
 }
 .notification > .subtitle {
   color: #ddd;
