@@ -155,10 +155,9 @@ function render(state) {
   // Append RocketBar to active screen (but not lock screen)
   var cappedScreenIndex = Math.max(state.index, 1);
 
-  var rocketbarEl = state.rocketbarEl;
-  state.index === 0 ?
-    rocketbarEl.classList.add('js-rocketbar-push-left') :
-    rocketbarEl.classList.remove('js-rocketbar-push-left');
+  // Set top-level class indicating panel state.
+  var stageEl = state.stageEl;
+  stageEl.className = stageEl.className.replace(/state-index-\d/, 'state-index-' + state.index);
 
   // Toggle classes for activated cards.
   reduce(state.cardEls, reduceActivateCardEl, state);
@@ -202,6 +201,7 @@ var STATE = updateState({}, {
   screensEl: homeScreensEl,
   screenEls: homeScreensEl.children,
   backgroundEl: bg1El,
+  stageEl: stageEl,
   rocketbarEl: rocketbarEl,
   activeCardEl: null,
   cardEls: cardEls
