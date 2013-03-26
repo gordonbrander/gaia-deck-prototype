@@ -164,10 +164,9 @@ function render(state) {
 
   // Add class to .home-screens for toggled cards. Apparently
   // CSS transforms trigger new stacking contexts for z-index.
-  var screensElClassList = state.screensEl.classList;
   state.activeCardEl ?
-    screensElClassList.add('home-screens-has-deck-card-zoomed-in') :
-    screensElClassList.remove('home-screens-has-deck-card-zoomed-in');
+    stageEl.classList.add('state-deck-card-zoomed-in') :
+    stageEl.classList.remove('state-deck-card-zoomed-in');
 
   return state;
 }

@@ -55,7 +55,7 @@ a:active {
   width: 320px;
 }
 
-.home-screens-has-deck-card-zoomed-in {
+.state-deck-card-zoomed-in .home-screens {
   /* Cover rocketbar when home screen is zoomed in.
   Apparently CSS transforms trigger new stacking contexts for z-index. */
   z-index: 99;
@@ -321,11 +321,15 @@ a:active {
   padding: 36px 12px 0;
   position: absolute;
   transition: left 500ms cubic-bezier(0.215, 0.610, 0.355, 1.000),
-              opacity 500ms cubic-bezier(0.215, 0.610, 0.355, 1.000);
+              opacity 300ms ease-out;
   right: 0;
   top: 0;
   width: 296px;
   z-index: 2;
+}
+
+.state-deck-card-zoomed-in .rocketbar {
+  opacity: 0;
 }
 
 .state-index-0 .rocketbar {
