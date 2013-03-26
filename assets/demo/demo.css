@@ -402,7 +402,7 @@ a:active {
 .rocketbar-input {
   background: transparent;
   display: block;
-  font-size: 16px;
+  font: 16px "Feura Sans", "MozTT", sans-serif;
   border: 0;
   height: 23px;
   padding: 7px 0 6px;
