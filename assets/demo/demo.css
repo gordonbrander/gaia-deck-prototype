@@ -106,6 +106,14 @@ a:active {
   top: 114px;
   width: 3000px;
 }
+.demo-mask-cover {
+  height: 480px;
+  left: 356px;
+  position: absolute;
+  top: 114px;
+  width: 3000px;
+  z-index: 999;
+}
 
 .demo-matte {
   background: #000;
