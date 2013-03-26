@@ -1,5 +1,31 @@
+@font-face {
+    font-family: 'MozTT';
+    src: url(../moztt/moztt-medium.woff) format('woff'),
+         local('MozTT');
+    font-weight: 600;
+    font-style: normal;
+
+}
+@font-face {
+    font-family: 'MozTT';
+    src: url(../moztt/moztt-regular.woff) format('woff'),
+         local('MozTT');
+    font-weight: normal;
+    font-style: normal;
+
+}
+@font-face {
+    font-family: 'MozTT';
+    src: url(../moztt/moztt-light.woff) format('woff'),
+         local('MozTT');
+    font-weight: 200;
+    font-style: normal;
+
+}
+
 html {
   background: #333;
+  font: 16px "Feura Sans", "MozTT", sans-serif;
   overflow: hidden;
 }
 
